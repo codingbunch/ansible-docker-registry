@@ -1,0 +1,49 @@
+---
+# tasks file for ansible-docker-registry
+
+- name: Install base dependencies
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - build-essential
+    - libevent-dev
+    - libssl-dev
+    - liblzma-dev
+    - python-dev
+    - python-pip
+    - python-passlib
+    - swig
+  tags: base
+
+- name: Install Docker Registry
+  pip: name=docker-registry state=present
+  tags: base
+
+- name: Create required directories
+  file: dest={{ item }} state=directory
+  with_items:
+    - "{{ storage_path }}"
+    - /var/log/docker-registry
+    - /etc/docker-registry
+  tags: base
+
+- name: Set configuration file
+  template: >
+    src=config.yml.j2
+    dest=/etc/docker-registry/config.yml
+  notify: restart docker-registry
+  tags: base
+
+- name: Create symlink for config
+  file: >
+    src=/etc/docker-registry/config.yml
+    dest=/usr/local/lib/python2.7/dist-packages/config/config.yml
+    state=link
+  tags: base
+
+- name: Install docker-registry init file
+  file: src=docker-registry.init dest=/etc/init/docker-registry.conf state=file
+  tags: base
+
+- name: Ensure Docker Registry is enabled and running
+  service: name=docker-registry state=running enabled=yes
+  tags: base

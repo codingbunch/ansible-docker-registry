@@ -1,0 +1,50 @@
+upstream docker-registry {
+  server localhost:5000;
+}
+
+server {
+  {% if registry_ssl %}
+  listen {{ registry_ssl_port }};
+  {% else %}
+  listen {{ registry_port }};
+  {% endif %}
+  {% if domain != 'localhost' %}
+  server_name {{ domain }};
+  {% endif %}
+
+  proxy_set_header Host $http_host; # required for docker client's sake
+  proxy_set_header X-Real-IP $remote_addr; # pass on real client's IP
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_connect_timeout 900;
+
+  client_max_body_size 0; # disable any limits to avoid HTTP 413 for large image uploads
+  
+  # required to avoid HTTP 411: see Issue #1486 (https://github.com/dotcloud/docker/issues/1486)
+  chunked_transfer_encoding on;
+
+  {% if registry_ssl %}
+  ssl on;
+  {% if registry_ssl_cert %}
+  ssl_certificate {{ registry_ssl_cert }};
+  {% endif %}
+  {% if registry_ssl_key %}
+  ssl_certificate_key {{ registry_ssl_key }};
+  {% endif %}
+  {% endif %}
+
+  location / {
+    auth_basic              "Restricted";
+    auth_basic_user_file    /etc/nginx/docker-registry.htpasswd;
+    proxy_pass http://docker-registry;
+  }
+
+  location /_ping {
+    auth_basic off;
+    proxy_pass http://docker-registry;
+  }
+
+  location /v1/_ping {
+    auth_basic off;
+    proxy_pass http://docker-registry;
+  }
+}

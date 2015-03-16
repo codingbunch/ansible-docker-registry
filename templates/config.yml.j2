@@ -1,0 +1,46 @@
+# All other flavors inherit the `common' config snippet
+common: &common
+  issue: '"docker-registry server"'
+  loglevel: _env:LOGLEVEL:{{ log_level }}
+  # Enable debugging (additional informations in the output of the _ping endpoint)
+  debug: _env:DEBUG:false
+  standalone: true
+  search_backend: sqlalchemy
+  sqlalchemy_index_database: sqlite:///{{ storage_path }}/docker-registry.db
+  storage_path: _env:STORAGE_PATH:{{ storage_path }}
+
+{% if use_redis %}
+  # Enabling LRU cache for small files. This speeds up read/write on
+  # small files when using a remote storage backend (like S3).
+  cache:
+    host: localhost
+    port: 6379
+    db: 0
+  cache_lru:
+    host: localhost
+    port: 6379
+    db: 0
+{% endif %}
+
+{% if storage_type == 'local' %}
+local: &local
+  <<: *common
+  storage: file  
+{% endif %}  
+
+{% if storage_type == 's3' %}
+s3: &s3
+    <<: *common
+    storage: s3
+    s3_region: _env:AWS_REGION:{{ s3_region }}
+    s3_bucket: _env:AWS_BUCKET:{{ s3_bucket }}
+    s3_encrypt: _env:AWS_ENCRYPT:true
+    s3_secure: _env:AWS_SECURE:true
+    boto_bucket: _env:AWS_BUCKET:{{ s3_bucket }}
+    s3_access_key: _env:AWS_KEY:{{ s3_access_key }}
+    s3_secret_key: _env:AWS_SECRET:{{ s3_secret_key }}
+{% endif %}
+ 
+
+prod:
+  <<: *{{storage_type }}

@@ -1,0 +1,36 @@
+---
+# defaults file for ansible-docker-registry
+domain: localhost
+log_level: info
+storage_type: local
+storage_path: /var/docker-registry
+use_nginx: true
+use_redis: true
+registry_port: 80
+
+# authenticated users
+auth_users: 
+  - { user: 'guest', passwd: '{PLAIN}secret' }
+
+# SSL Settings
+registry_ssl_port: 443
+registry_ssl: true
+registry_ssl_cert: /etc/ssl/certs/docker_registry.crt
+registry_ssl_key: /etc/ssl/private/docker_registry.key
+create_ssl_cert: true
+
+# OpenSSL cert settings
+openssl_bits: 2048
+openssl_countryName: ES
+openssl_stateOrProvinceName: Madrid
+openssl_localityName: Madrid
+openssl_organizationName: MyCompany
+openssl_organizationalUnitName: 'Docker Registry'
+openssl_commonName: mycompany.com
+
+# S3 Variables
+# s3_region
+# s3_bucket
+# s3_storage_path
+# s3_access_key
+# s3_secret_key

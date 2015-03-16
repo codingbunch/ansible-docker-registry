@@ -1,0 +1,44 @@
+---
+- name: Install Nginx server
+  apt: name={{ item }} state=present
+  with_items: 
+    - nginx-extras
+    - apache2-utils
+  tags: nginx
+
+- name: Create authenticated users
+  htpasswd: path=/etc/nginx/docker-registry.htpasswd name={{item.user}} password={{item.passwd}} crypt_scheme=plaintext
+  with_items: auth_users
+  tags: nginx
+
+- name: Verify ssl cert
+  stat: path={{ registry_ssl_cert }}
+  changed_when: false
+  register: ssl_cert
+  tags: nginx
+
+- name: Generate ssl cert
+  shell: >
+    openssl req -subj '/CN={{ domain }}/O={{openssl_organizationName}}/OU={{openssl_organizationalUnitName}}/C={{openssl_countryName}}/ST={{openssl_stateOrProvinceName}}/L={{openssl_localityName}}'
+    -new -newkey rsa:{{openssl_bits}} -days 365 -nodes -x509 -keyout {{ registry_ssl_key }} -out {{ registry_ssl_cert }}
+  when: create_ssl_cert and not ssl_cert.stat.exists
+  tags: nginx
+
+- name: Install nginx vhost
+  template: src=nginx.j2 dest=/etc/nginx/sites-available/docker-registry
+  tags: nginx
+
+- name: Create symlink to vhost
+  file: src=/etc/nginx/sites-available/docker-registry path=/etc/nginx/sites-enabled/docker-registry state=link
+  notify: restart nginx
+  tags: nginx
+
+- name: Remove default nginx vhost
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  when: domain == 'localhost'
+  notify: restart nginx
+  tags: nginx
+
+- name: Ensure nginx is running
+  service: name=nginx state=running enabled=yes
+  tags: nginx
