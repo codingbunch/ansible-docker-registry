@@ -29,7 +29,7 @@ Role Variables
 * ```registry_ssl_key```: Specify a SSL key to use (default: ```/etc/ssl/private/docker_registry.key```)
 * ```create_ssl_cert```: Create a self-signed certificate if ```registry_ssl_cert``` is not present on the system (default: ```true```)
 
-# OpenSSL cert settings
+### OpenSSL cert settings
 * ```openssl_bits```: Bit length of the private key (default: ```2048```)
 * ```openssl_countryName```: Country Code (default: ```ES```)
 * ```openssl_stateOrProvinceName```: State or Province (default: ```Madrid```)
