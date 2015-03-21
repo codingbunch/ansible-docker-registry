@@ -1,7 +1,7 @@
 ---
 # handlers file for ansible-docker-registry
 - name: restart docker-registry
-  service: name={{ docker_registry_service_name }} state=restarted
+  service: name=docker-registry state=restarted
 
 - name: restart nginx
   service: name=nginx state=restarted
