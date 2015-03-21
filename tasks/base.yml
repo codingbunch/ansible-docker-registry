@@ -41,7 +41,7 @@
   tags: base
 
 - name: Install docker-registry init file
-  file: src=docker-registry.init dest=/etc/init/docker-registry.conf state=file
+  copy: src=docker-registry.init dest=/etc/init/docker-registry.conf owner=root group=root mode=644
   tags: base
 
 - name: Ensure Docker Registry is enabled and running
