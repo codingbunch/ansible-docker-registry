@@ -9,6 +9,7 @@ use_redis: true
 registry_port: 80
 
 # authenticated users
+use_auth: false
 auth_users: 
   - { user: 'guest', passwd: '{PLAIN}secret' }
 

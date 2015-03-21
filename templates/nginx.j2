@@ -33,8 +33,12 @@ server {
   {% endif %}
 
   location / {
+    {% if use_auth %}
     auth_basic              "Restricted";
     auth_basic_user_file    /etc/nginx/docker-registry.htpasswd;
+    {% else %}
+    auth_basic off;
+    {% endif %}
     proxy_pass http://docker-registry;
   }
 

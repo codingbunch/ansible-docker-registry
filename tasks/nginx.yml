@@ -9,6 +9,7 @@
 - name: Create authenticated users
   htpasswd: path=/etc/nginx/docker-registry.htpasswd name={{item.user}} password={{item.passwd}} crypt_scheme=plaintext
   with_items: auth_users
+  when: use_auth
   tags: nginx
 
 - name: Verify ssl cert
