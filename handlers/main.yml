@@ -1,10 +1,5 @@
 ---
 # handlers file for ansible-docker-registry
-- name: update timezone
-  command: dpkg-reconfigure --frontend noninteractive tzdata
-
-- name: restart ntp
-  service: name=ntp state=restarted
 
 - name: restart docker-registry
   service: name=docker-registry state=restarted

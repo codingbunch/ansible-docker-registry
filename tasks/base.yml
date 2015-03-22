@@ -1,15 +1,6 @@
 ---
 # tasks file for ansible-docker-registry
 
-- name: Change timezone
-  copy: "content='{{ timezone }}' dest=/etc/timezone owner=root group=root mode=0644 backup=yes"
-  notify: update timezone
-  tags: base
-
-- name: Change localtime
-  copy: "src=/usr/share/zoneinfo/{{ timezone }} dest=/etc/localtime"
-  tags: base 
-
 - name: Install base dependencies
   apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
@@ -21,18 +12,7 @@
     - python-pip
     - python-passlib
     - swig
-    - ntp
   tags: base
-
-- name: Configure NTP in /etc/ntp.conf
-  template: src=ntp.conf.j2 dest=/etc/ntp.conf
-  notify:
-    - restart ntp    
-  tags: base
-
-- name: Be sure ntpd is running and enabled
-  service: name=ntp state=started enabled=yes
-  tags: base  
 
 - name: Install Docker Registry
   pip: name=docker-registry state=present
