@@ -46,6 +46,14 @@ Role Variables
 * ```s3_access_key```
 * ```s3_secret_key```
 
+### GCS Storage
+
+* ```gcs_bucket```: Value for the bucket deing used.
+* ```gcs_storage_path```: The path within th ebucket where to store data. (will be created if not exist).
+* ```gcs_oauth2```: oauth2 value (default ```false```)
+* ```gcs_access_key```: only used when gcs_oauth2 is false.
+* ```gcs_secret_key```: only used when gcs_oauth2 is false.
+
 ## Note on SSL
 
 If using a self-signed certificate, or no SSL certificate for recent docker versions, you must start the docker daemon with ```--insecure-registry```.

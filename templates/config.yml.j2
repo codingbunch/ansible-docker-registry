@@ -40,7 +40,20 @@ s3: &s3
     s3_access_key: _env:AWS_KEY:{{ s3_access_key }}
     s3_secret_key: _env:AWS_SECRET:{{ s3_secret_key }}
 {% endif %}
- 
+
+{% if storage_type == 'gcs' %}
+gcs: &gcs
+   <<: *common
+   storage: gcs
+   boto_bucket: _env:GCS_BUCKET:{{ gcs_bucket }}
+{% if gcs_oauth2 is defined and gcs_oauth2  %}
+   oauth2: {{ gcs_oauth2 }}
+{% else %}
+   gs_access_key: _env:GCS_KEY:{{ gcs_access_key }}
+   gs_secret_key: _env:GCS_SECRET:{{ gcs_secret_key }}
+{% endif %}
+   storage_path: _env:STORAGE_PATH:{{ gcs_storage_path }}
+{% endif %}
 
 prod:
   <<: *{{storage_type }}
