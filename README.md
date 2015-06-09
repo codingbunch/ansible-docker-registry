@@ -50,9 +50,21 @@ Role Variables
 
 * ```gcs_bucket```: Value for the bucket deing used.
 * ```gcs_storage_path```: The path within th ebucket where to store data. (will be created if not exist).
+
+#### There are 3 ways to specify credentials for GCS storage:
+
+**1. Using Google Cloud Platform OAuth:**
+
 * ```gcs_oauth2```: oauth2 value (default ```false```)
-* ```gcs_access_key```: only used when gcs_oauth2 is false.
-* ```gcs_secret_key```: only used when gcs_oauth2 is false.
+
+**2. Using Google Storage interoperability keys:**
+
+* ```gcs_access_key```: only used when gcs_oauth2 is false and ```use_gcs_default_credentials``` is undefined.
+* ```gcs_secret_key```: only used when gcs_oauth2 is false and ```use_gcs_default_credentials``` is undefined.
+
+**3. Using Google service account authorization:**
+
+* ```use_gcs_default_credentials```: use a service account that has been attached to that virtual machine for [authorisation](https://developers.google.com/identity/protocols/application-default-credentials) value (default ```undefined```)
 
 ## Note on SSL
 
