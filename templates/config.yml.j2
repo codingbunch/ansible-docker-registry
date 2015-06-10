@@ -48,6 +48,13 @@ gcs: &gcs
    boto_bucket: _env:GCS_BUCKET:{{ gcs_bucket }}
 {% if gcs_oauth2 is defined and gcs_oauth2  %}
    oauth2: {{ gcs_oauth2 }}
+{% elif use_gcs_default_credentials is defined %}
+   # No oauth2 or [gcs_access_key|gcs_secret_key] let us use a service account
+   # that is connected to the virtual machine instance see Google Application
+   # Default Credentials (see
+   # https://developers.google.com/identity/protocols/application-default-credentials)
+   # to allow the docker registry to get its authorisation credentials by making
+   # google api calls.
 {% else %}
    gs_access_key: _env:GCS_KEY:{{ gcs_access_key }}
    gs_secret_key: _env:GCS_SECRET:{{ gcs_secret_key }}
