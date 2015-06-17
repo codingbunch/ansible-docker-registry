@@ -46,6 +46,16 @@ Role Variables
 * ```s3_access_key```
 * ```s3_secret_key```
 
+#### There are 2 ways to specify credentials for S3 storage:
+
+**1. Using access and secret keys:**
+
+By specifying ```s3_access_key``` and ```s3_secret_key```.
+
+**2. Using IAM instance profiles**
+
+By omitting ```s3_access_key``` and ```s3_secret_key``` it will use an IAM instance profile that has been attached to that virtual machine for [authorisation](http://docs.aws.amazon.com/IAM/latest/UserGuide/roles-usingrole-ec2instance.html).
+
 ### GCS Storage
 
 * ```gcs_bucket```: Value for the bucket deing used.

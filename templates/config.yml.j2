@@ -37,8 +37,14 @@ s3: &s3
     s3_encrypt: _env:AWS_ENCRYPT:true
     s3_secure: _env:AWS_SECURE:true
     boto_bucket: _env:AWS_BUCKET:{{ s3_bucket }}
+{% if s3_access_key is defined and s3_secret_key is defined %}
     s3_access_key: _env:AWS_KEY:{{ s3_access_key }}
     s3_secret_key: _env:AWS_SECRET:{{ s3_secret_key }}
+{% else %}
+    # No [s3_access_key|s3_secret_key] lets us use an IAM instance profile
+    # that is attached to the virtual machine. See:
+    # http://docs.aws.amazon.com/IAM/latest/UserGuide/roles-usingrole-ec2instance.html
+{% endif %}
 {% endif %}
 
 {% if storage_type == 'gcs' %}
