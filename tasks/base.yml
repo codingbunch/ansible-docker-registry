@@ -14,8 +14,14 @@
     - swig
   tags: base
 
-- name: Install Docker Registry
+- name: Install latest version of Docker Registry
   pip: name=docker-registry state=present
+  when: docker_registry_version is not defined
+  tags: base
+
+- name: Install a specific version of Docker Registry
+  pip: name=docker-registry state=present version={{ docker_registry_version }}
+  when: docker_registry_version is defined
   tags: base
 
 - name: Create required directories
