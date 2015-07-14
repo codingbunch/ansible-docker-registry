@@ -21,6 +21,7 @@ Role Variables
 * ```storage_path```: File path to store registry uploads (default: ```/var/docker-registry```)
 * ```use_nginx```: Install Nginx and configure docker-registry vhost (default: ```true```)
 * ```use_redis```: Install and configure Redis server as a cache (default: ```true```)
+* ```docker_registry_version```: Specify what version of docker_registry needs to be installed (default: ```none```)
 
 ### SSL Settings
 * ```registry_port```: Custom port to have nginx listen on (default: ```80```)
