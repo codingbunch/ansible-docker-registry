@@ -1,31 +1,21 @@
 ---
 # tasks file for ansible-docker-registry
 
-- name: Install base dependencies
-  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - build-essential
-    - libevent-dev
-    - libssl-dev
-    - liblzma-dev
-    - python-dev
-    - python-pip
-    - python-passlib
-    - swig
-  tags: base
-
 - name: Install latest version of Docker Registry
-  pip: name=docker-registry state=present
+  apt: name=docker-registry state=present
   when: docker_registry_version is not defined
   tags: base
 
 - name: Install a specific version of Docker Registry
-  pip: name=docker-registry state=present version={{ docker_registry_version }}
+  apt: name=docker-registry state=present version={{ docker_registry_version }}
   when: docker_registry_version is defined
   tags: base
 
 - name: Create required directories
-  file: dest={{ item }} state=directory
+  file: 
+    dest: "{{ item }}" 
+    state: directory
+    owner: docker-registry
   with_items:
     - "{{ storage_path }}"
     - /var/log/docker-registry
@@ -35,19 +25,8 @@
 - name: Set configuration file
   template: >
     src=config.yml.j2
-    dest=/etc/docker-registry/config.yml
+    dest=/etc/docker/registry/config.yml
   notify: restart docker-registry
-  tags: base
-
-- name: Create symlink for config
-  file: >
-    src=/etc/docker-registry/config.yml
-    dest=/usr/local/lib/python2.7/dist-packages/config/config.yml
-    state=link
-  tags: base
-
-- name: Install docker-registry init file
-  copy: src=docker-registry.init dest=/etc/init/docker-registry.conf owner=root group=root mode=644
   tags: base
 
 - name: Install gcs backend driver.
