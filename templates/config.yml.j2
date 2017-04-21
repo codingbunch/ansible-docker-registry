@@ -1,60 +1,31 @@
-# All other flavors inherit the `common' config snippet
-common: &common
-  issue: '"docker-registry server"'
-  loglevel: _env:LOGLEVEL:{{ log_level }}
-  # Enable debugging (additional informations in the output of the _ping endpoint)
-  debug: _env:DEBUG:false
-  standalone: true
-  search_backend: sqlalchemy
-  sqlalchemy_index_database: sqlite:///{{ storage_path }}/docker-registry.db
-  storage_path: _env:STORAGE_PATH:{{ storage_path }}
-
-{% if use_redis %}
-  # Enabling LRU cache for small files. This speeds up read/write on
-  # small files when using a remote storage backend (like S3).
-  cache:
-    host: localhost
-    port: 6379
-    db: 0
-  cache_lru:
-    host: localhost
-    port: 6379
-    db: 0
-{% endif %}
-
+version: 0.1
+log:
+  level: "{{ log_level }}"
+http:
+  addr: localhost:5000
+storage:
 {% if storage_type == 'local' %}
-local: &local
-  <<: *common
-  storage: file  
-{% endif %}  
-
+  filesystem:
+    rootdirectory: "{{ storage_path }}"
+    maxthreads: 100
+{% endif %}
 {% if storage_type == 's3' %}
-s3: &s3
-    <<: *common
-    storage: s3
-    s3_region: _env:AWS_REGION:{{ s3_region }}
-    s3_bucket: _env:AWS_BUCKET:{{ s3_bucket }}
-    s3_encrypt: _env:AWS_ENCRYPT:true
-    s3_secure: _env:AWS_SECURE:true
-    boto_bucket: _env:AWS_BUCKET:{{ s3_bucket }}
+  s3: 
+    region: "{{ s3_region }}"
+    bucket: "{{ s3_bucket }}"
 {% if s3_access_key is defined and s3_secret_key is defined %}
-    s3_access_key: _env:AWS_KEY:{{ s3_access_key }}
-    s3_secret_key: _env:AWS_SECRET:{{ s3_secret_key }}
+    accesskey: "{{ s3_access_key }}"
+    secretkey: "{{ s3_secret_key }}"
 {% else %}
     # No [s3_access_key|s3_secret_key] lets us use an IAM instance profile
     # that is attached to the virtual machine. See:
     # http://docs.aws.amazon.com/IAM/latest/UserGuide/roles-usingrole-ec2instance.html
 {% endif %}
 {% endif %}
-
 {% if storage_type == 'gcs' %}
-gcs: &gcs
-   <<: *common
-   storage: gcs
-   boto_bucket: _env:GCS_BUCKET:{{ gcs_bucket }}
-{% if gcs_oauth2 is defined and gcs_oauth2  %}
-   oauth2: {{ gcs_oauth2 }}
-{% elif use_gcs_default_credentials is defined %}
+  gcs:
+    bucket: "{{ gcs_bucket }}"
+{% if use_gcs_default_credentials is defined %}
    # No oauth2 or [gcs_access_key|gcs_secret_key] let us use a service account
    # that is connected to the virtual machine instance see Google Application
    # Default Credentials (see
@@ -62,11 +33,10 @@ gcs: &gcs
    # to allow the docker registry to get its authorisation credentials by making
    # google api calls.
 {% else %}
-   gs_access_key: _env:GCS_KEY:{{ gcs_access_key }}
-   gs_secret_key: _env:GCS_SECRET:{{ gcs_secret_key }}
-{% endif %}
-   storage_path: _env:STORAGE_PATH:{{ gcs_storage_path }}
+    gcs_keyfile: "{{ gcs_keyfile }}"
 {% endif %}
 
-prod:
-  <<: *{{storage_type }}
+{% if use_redis %}
+redis:
+  addr: localhost:6379
+{% endif %}
